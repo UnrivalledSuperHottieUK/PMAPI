@@ -14,7 +14,8 @@ namespace PMAPI.CustomSubstances.Patches
     {
         private static bool Prefix(ref SubstanceParameters.Param __result, Substance substance)
         {
-            if (substance >= 0)
+          var maxSubstance = Enum.GetValues(typeof(Substance)).Cast<Substance>().Select(x => (int)x).Max();
+            if ((int)substance <= maxSubstance)
                 return true;
 
             if (CustomSubstanceManager.customSubstances.TryGetValue(substance, out SubstanceParameters.Param val))

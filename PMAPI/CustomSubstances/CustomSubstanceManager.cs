@@ -25,8 +25,8 @@ namespace PMAPI.CustomSubstances
         internal static Dictionary<Substance, CustomSubstanceParams> customParams = new();
         internal static SubstanceParameters.Param errorSubParams;
 
-        private static int id = -1;
-
+        //private static int id = -1;
+        private static Dictionary<string, int> currentId = new();
         /// <summary>
         /// Registers custom substance in game
         /// </summary>
@@ -36,12 +36,26 @@ namespace PMAPI.CustomSubstances
         /// <returns>ID of registered substance used by the game</returns>
         public static Substance RegisterSubstance(string eid, SubstanceParameters.Param substanceParams, CustomSubstanceParams cParams)
         {
+            var modAttrib = Assembly.GetCallingAssembly().GetCustomAttribute<PMAPIModAttribute>();
+            if (!currentId.TryGetValue(modAttrib.id, out var id))
+            {
+              id = modAttrib.substanceStart;
+            }
+            var guideKey = substanceParams.displayNameKey + "_GUIDE";
+
+            MelonLogger.Msg("current id" + id + " name " + eid);
             customSubstances.Add((Substance)id, substanceParams);
             customParams.Add((Substance)id, cParams);
 
-            var modAttrib = Assembly.GetCallingAssembly().GetCustomAttribute<PMAPIModAttribute>();
+            
             EIDManager.eidDictionary.Add((Substance)id, $"{modAttrib.id}:{eid}");
-
+            CustomLocalizer.AddEnString(guideKey, cParams.enGuide);
+            CustomLocalizer.AddJpString(guideKey, cParams.jpGuide);
+            CustomLocalizer.AddZhHansString(guideKey, cParams.zhHansGuide);
+            CustomLocalizer.AddDeString(guideKey, cParams.deGuide);
+            CustomLocalizer.AddEsString(guideKey, cParams.esGuide);
+            CustomLocalizer.AddFrString(guideKey, cParams.frGuide);
+            CustomLocalizer.AddRuString(guideKey, cParams.ruGuide);
             CustomLocalizer.AddEnString(substanceParams.displayNameKey, cParams.enName);
             CustomLocalizer.AddJpString(substanceParams.displayNameKey, cParams.jpName);
 
@@ -52,8 +66,9 @@ namespace PMAPI.CustomSubstances
             CustomLocalizer.AddRuString(substanceParams.displayNameKey, cParams.ruName);
 
             MelonLogger.Msg("Substance registered: " + EIDManager.eidDictionary[(Substance)id]);
-            id--;
-            return (Substance)id + 1;
+            currentId[modAttrib.id] = id + 1;
+
+            return (Substance)id;
         }
 
         private static void CreateErrorSubstance()
@@ -93,9 +108,19 @@ namespace PMAPI.CustomSubstances
         public string enName;
 
         /// <summary>
+        /// Name in English
+        /// </summary>
+        public string enGuide;
+
+        /// <summary>
         /// Name in Japanese
         /// </summary>
         public string jpName;
+
+        /// <summary>
+        /// Name in Japanese
+        /// </summary>
+        public string jpGuide;
 
         /// <summary>
         /// Name in Simplified Chinese
@@ -103,9 +128,19 @@ namespace PMAPI.CustomSubstances
         public string zhHansName;
 
         /// <summary>
+        /// Name in Simplified Chinese
+        /// </summary>
+        public string zhHansGuide;
+
+        /// <summary>
         /// Name in German
         /// </summary>
         public string deName;
+
+        /// <summary>
+        /// Name in German
+        /// </summary>
+        public string deGuide;
 
         /// <summary>
         /// Name in Spanish
@@ -113,14 +148,29 @@ namespace PMAPI.CustomSubstances
         public string esName;
 
         /// <summary>
+        /// Name in Spanish
+        /// </summary>
+        public string esGuide;
+
+        /// <summary>
         /// Name in French
         /// </summary>
         public string frName;
 
         /// <summary>
+        /// Name in French
+        /// </summary>
+        public string frGuide;
+
+        /// <summary>
         /// Name in Russian
         /// </summary>
         public string ruName;
+
+        /// <summary>
+        /// Name in Russian
+        /// </summary>
+        public string ruGuide;
 
         /// <summary>
         /// Delegate that is called whenever object is initalizing its script

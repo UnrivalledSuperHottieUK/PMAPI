@@ -13,13 +13,15 @@ namespace PMAPI
     public sealed class PMAPIModAttribute : Attribute
     {
         public readonly string id;
+        public readonly int substanceStart;
 
         /// <summary>
         /// Attribute that tells PMAPI mod id for use in extended IDs (EID)
         /// </summary>
         /// <param name="id">Mod id</param>
-        public PMAPIModAttribute(string id)
+        public PMAPIModAttribute(string id, int substanceStart)
         {
+            this.substanceStart = substanceStart;
             this.id = id;
         }
     }

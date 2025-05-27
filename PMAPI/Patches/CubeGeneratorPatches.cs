@@ -13,14 +13,17 @@ namespace PMAPI.Patches
 {
     [HarmonyPatch(typeof(CubeGenerator), nameof(CubeGenerator.GenerateGroup))]
     internal static class CubeGeneratorGenerateSavedChunkPatch
+
     {
         private static void Postfix(SaveAndLoad.GroupData groupData)
         {
+            var maxSubstance = Enum.GetValues(typeof(Substance)).Cast<Substance>().Select(x => (int)x).Max();
             foreach (var req in CustomSaveManager.loadRequests)
             {
                 foreach (var cube in groupData.cubes)
                 {
-                    if (cube.substance >= 0 || req.done || cube.pos != req.beh.transform.localPosition || cube.substance != req.cubeBase.substance)
+                    
+                    if ((int)cube.substance <= maxSubstance || req.done || cube.pos != req.beh.transform.localPosition || cube.substance != req.cubeBase.substance)
                         continue;
 
                     req.beh.GetType().GetMethod("Load").Invoke(req.beh, new string[] { cube.states[0] });
